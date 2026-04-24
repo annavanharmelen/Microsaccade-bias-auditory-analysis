@@ -3,11 +3,11 @@ close all
 clc
 
 %% set parameters and loops
-display_percentage_ok = 0;
-plot_individuals = 1;
+display_percentage_ok = 1;
+plot_individuals = 0;
 plot_averages = 1;
 
-pp2do = [1];
+pp2do = [1:5];
 p = 0;
 
 subplot_size = 1;
@@ -26,7 +26,7 @@ for pp = pp2do
     %% check percentage oktrials
     % select trials with reasonable decision times
     oktrials = abs(zscore(behdata.idle_reaction_time_in_ms))<=3; 
-    percentageok(p) = mean(oktrials)*100;
+    percentageok(p,1) = mean(oktrials)*100;
   
     % display percentage ok trials
     if display_percentage_ok
@@ -122,11 +122,12 @@ if plot_averages
     subplot(4,1,1);
     bar(ppnum, overall_dt(:,1));
     title('overall decision time');
-    ylim([0 900]);
+    ylim([0 1200]);
     xlabel('pp #');
 
     subplot(4,1,2);
     bar(ppnum, overall_error(:,1));
+    ylim([-0.4 0.8]);
     title('overall error');
     xlabel('pp #');
 
@@ -134,6 +135,7 @@ if plot_averages
     hold on
     bar(ppnum, overall_abs_error(:,1));
     plot([0, max(ppnum)], [250 250]);
+    ylim([0 3]);
     title('overall abs error');
     xlabel('pp #');
 
@@ -186,7 +188,7 @@ if plot_averages
     xticklabels(frequencies);
     xlabel('Target frequency (Hz)');
     ylabel('Responded frequency (Hz)');
-    legend({'p1', 'ideal pp'});
+    legend({'p1', 'p2', 'p3', 'p5', 'p6','ideal pp'});
 
     figure(figure_nr);
     figure_nr = figure_nr+1;
