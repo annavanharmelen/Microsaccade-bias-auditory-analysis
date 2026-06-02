@@ -3,7 +3,7 @@ function param = getSubjParam(pp)
 %% participant-specific notes
 
 %% set path and pp-specific file locations
-unique_numbers = [48, 39, 43, 32, 70, 30, 21, 79, 69]; %needs to be in the right order
+unique_numbers = [48, 39, 43, 32, 70, 30, 21, 79, 69, 94, 42, 53]; %needs to be in the right order
 
 param.path = '\\scistor.vu.nl\shares\FGB-ETP-CogPsy-ProactiveBrainLab\core_lab_members\Anna\Data\m6 - auditory\';
 
