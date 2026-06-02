@@ -8,14 +8,14 @@ clear; clc; close all;
 oneOrTwoD       = 1;
 oneOrTwoD_options = {'_1D','_2D'};
 
-pp2do           = [1:12];
+pp2do           = [1:10];
 
 nsmooth         = 200;
-plotSinglePps   = 0;
+plotSinglePps   = 1;
 plotGAs         = 1;
 xlimtoplot      = [-100 1500];
 
-subplot_size = 3;
+subplot_size = 4;
 
 %% load and aggregate the data from all pp
 s = 0;
@@ -64,7 +64,7 @@ saccadesize.effect = squeeze(mean(d6));
 
 %% all subs
 if plotSinglePps
-    % toward & away - all
+    % toward & away - auditory all
     figure;
     for sp = 1:s
         subplot(subplot_size,subplot_size,sp); hold on;
@@ -72,37 +72,22 @@ if plotSinglePps
         plot(saccade.time, squeeze(d2(sp,1,:)));
         plot(xlim, [0,0], '--k');
         xlim(xlimtoplot);
-        % ylim([-0.5 0.5]);
         title(pp2do(sp));
     end
-    legend({'all'});
+    legend({'toward (auditory)', 'away (auditory)'});
 
-    % toward vs away - all
+    % toward vs away - auditory all
     figure;
     for sp = 1:s
         subplot(subplot_size,subplot_size,sp); hold on;
         plot(saccade.time, squeeze(d3(sp,1,:)));
         plot(xlim, [0,0], '--k');
         xlim(xlimtoplot);
-        % ylim([-0.5 0.5]);
         title(pp2do(sp));
     end
-    legend({'all'});
+    legend({'auditory all'});
 
-    % toward vs. away - targ1 vs targ2 
-    figure;
-    for sp = 1:s
-        subplot(subplot_size,subplot_size,sp); hold on;
-        plot(saccade.time, squeeze(d3(sp,2,:)));
-        plot(saccade.time, squeeze(d3(sp,3,:)));
-        plot(xlim, [0,0], '--k');
-        xlim(xlimtoplot);
-        % ylim([-0.5 0.5]);
-        title(pp2do(sp));
-    end
-    legend({'targ1', 'targ2'});
-
-    % towardness for all conditions condition - saccade bias X saccade size
+    % towardness sizecourse - auditory all
     figure;
     for sp = 1:s
         subplot(subplot_size,subplot_size,sp);
@@ -111,50 +96,91 @@ if plotSinglePps
         cfg.figure = 'gcf';
         cfg.zlim = [-.1 .1];
         cfg.xlim = xlimtoplot;
-        for sp = 1:s
-            subplot(subplot_size,subplot_size,sp); hold on;
-            saccadesize.effect = squeeze(d6(sp,:,:,:)); % put in data from this pp
-            cfg.channel = 1; % all conditions combined.
-            ft_singleplotTFR(cfg, saccadesize);
-            title(pp2do(sp));
-        end
+        saccadesize.effect = squeeze(d6(sp,:,:,:)); % put in data from this pp
+        cfg.channel = 1; % all auditory
+        ft_singleplotTFR(cfg, saccadesize);
+        title(pp2do(sp));
+        colormap('jet');
+    end
+
+    % toward & away - visual all
+    figure;
+    for sp = 1:s
+        subplot(subplot_size,subplot_size,sp); hold on;
+        plot(saccade.time, squeeze(d1(sp,6,:)));
+        plot(saccade.time, squeeze(d2(sp,6,:)));
+        plot(xlim, [0,0], '--k');
+        xlim(xlimtoplot);
+        title(pp2do(sp));
+    end
+    legend({'toward (visual)', 'away (visual)'});
+
+    % toward vs away - visual all
+    figure;
+    for sp = 1:s
+        subplot(subplot_size,subplot_size,sp); hold on;
+        plot(saccade.time, squeeze(d3(sp,6,:)));
+        plot(xlim, [0,0], '--k');
+        xlim(xlimtoplot);
+        title(pp2do(sp));
+    end
+    legend({'visual all'});
+
+    % towardness sizecourse - visual all
+    figure;
+    for sp = 1:s
+        subplot(subplot_size,subplot_size,sp);
+        cfg = [];
+        cfg.parameter = 'effect';
+        cfg.figure = 'gcf';
+        cfg.zlim = [-.1 .1];
+        cfg.xlim = xlimtoplot;
+        hold on;
+        saccadesize.effect = squeeze(d6(sp,:,:,:)); % put in data from this pp
+        cfg.channel = 6; % all visual
+        ft_singleplotTFR(cfg, saccadesize);
+        title(pp2do(sp));
         colormap('jet');
     end
 end
 
 %% Plot grand average data patterns of interest, with error bars
 if plotGAs
-    % plot toward, away and effect - all
+    % plot towardness of auditory and visual
+    figure; 
+    hold on
+    p1 = frevede_errorbarplot(saccade.time, squeeze(d3(:,1,:)), 'b', 'se');
+    p2 = frevede_errorbarplot(saccade.time, squeeze(d3(:,6,:)), 'r', 'se');
+    xline(0, '--');
+    yline(0, '--');
+    legend([p1, p2], {'auditory', 'visual'});
+    ylabel('Rate (Hz)');
+    xlabel('Time (ms)');
+    xlim(xlimtoplot);
+    hold off
+
+    % plot toward and away of auditory
     figure; 
     hold on
     p1 = frevede_errorbarplot(saccade.time, squeeze(d1(:,1,:)), 'b', 'se');
     p2 = frevede_errorbarplot(saccade.time, squeeze(d2(:,1,:)), 'r', 'se');
     legend([p1, p2], {'toward', 'away'});
-    ylim([-0.5, 1])
+    title('Auditory');
     ylabel('Rate (Hz)');
     xlabel('Time (ms)');
-    hold off
-    
-    % plot toward vs. away - targ1 vs targ2 
-    figure;
-    hold on
-    p5 = frevede_errorbarplot(saccade.time, squeeze(d3(:,2,:)), 'c', 'se');
-    p6 = frevede_errorbarplot(saccade.time, squeeze(d3(:,3,:)), 'm', 'se');
-    legend([p5, p6], {'targ1', 'targ2'});
-    ylabel('Rate (Hz)');
-    xlabel('Time (ms)');
-    hold off
-    
-    % plot the effect
-    figure;
-    hold on
-    p7 = frevede_errorbarplot(saccade.time, squeeze(d3(:,1,:)), 'k', 'both');
     xlim(xlimtoplot);
-    yticks([0 0.05]);
-    plot(xlim, [0,0], '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
-    plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
+    hold off
+
+    % plot toward and away of auditory
+    figure; 
+    hold on
+    p1 = frevede_errorbarplot(saccade.time, squeeze(d1(:,6,:)), 'b', 'se');
+    p2 = frevede_errorbarplot(saccade.time, squeeze(d2(:,6,:)), 'r', 'se');
+    legend([p1, p2], {'toward', 'away'});
+    title('Visual');
     ylabel('Rate (Hz)');
     xlabel('Time (ms)');
+    xlim(xlimtoplot);
     hold off
     
     %% just effect as function of saccade size
@@ -166,12 +192,15 @@ if plotGAs
     cfg.xlim = xlimtoplot;  
     cfg.colormap = 'jet';
     
-    % per condition
+    % for main conditions (auditory and visual)
+    c = 0;
+
     figure;
-    for chan = 1:5
+    for chan = [1,6]
+        c = c + 1;
         hold on
         cfg.channel = chan;
-        subplot(2,3,chan);
+        subplot(1,2,c);
         saccadesize.effect = squeeze(mean(d6(:,:,:,:))); % put in data from all pp
         ft_singleplotTFR(cfg, saccadesize);
         ylabel('Saccade size (dva)');
