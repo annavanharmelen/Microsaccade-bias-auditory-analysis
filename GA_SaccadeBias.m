@@ -155,7 +155,6 @@ if plotGAs
     plot([0,0], ylim, '--', 'LineWidth',2, 'Color', [0.6, 0.6, 0.6]);
     ylabel('Rate (Hz)');
     xlabel('Time (ms)');
-    xlabel('Time (ms)');
     hold off
     
     %% just effect as function of saccade size
